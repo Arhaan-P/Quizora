@@ -275,9 +275,9 @@ class _CategoriesScreenState extends State<CategoriesScreen>
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: isDark ? Colors.grey[850] : Colors.white,
+        color: isDark ? const Color(0xFF2D2D44) : Colors.white,
         border: Border.all(
-          color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
+          color: isDark ? const Color(0xFF404040) : Colors.grey[200]!,
           width: 1,
         ),
         boxShadow: [
@@ -314,7 +314,9 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: isDark ? Colors.grey[800] : Colors.grey[100],
+                        color: isDark
+                            ? const Color(0xFF3D3D5C)
+                            : Colors.grey[100],
                       ),
                       child: Text(
                         category.icon,
@@ -337,26 +339,6 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                 ),
 
                 const SizedBox(height: 8),
-
-                // Progress bar
-                Container(
-                  height: 4,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(2),
-                    color: isDark ? Colors.grey[700] : Colors.grey[200],
-                  ),
-                  child: FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: category.progress,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(2),
-                        color: isDark ? Colors.blue[400] : Colors.blue[600],
-                      ),
-                    ),
-                  ),
-                ),
-
                 const Spacer(),
 
                 // Action buttons

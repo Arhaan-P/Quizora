@@ -16,9 +16,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _selectedIndex = 0;
   late AnimationController _animationController;
 
-  final List<Widget> _screens = [
+  List<Widget> get _screens => [
     const CategoriesScreen(),
-    const AddFlashcardScreen(),
+    AddFlashcardScreen(
+      onBackPressed: () {
+        // Navigate to Categories tab when back button is pressed
+        setState(() {
+          _selectedIndex = 0;
+        });
+      },
+    ),
   ];
 
   @override

@@ -6,7 +6,9 @@ import '../providers/flashcard_provider.dart';
 import '../models/flashcard.dart';
 
 class AddFlashcardScreen extends StatefulWidget {
-  const AddFlashcardScreen({super.key});
+  final VoidCallback? onBackPressed;
+
+  const AddFlashcardScreen({super.key, this.onBackPressed});
 
   @override
   State<AddFlashcardScreen> createState() => _AddFlashcardScreenState();
@@ -118,22 +120,21 @@ class _AddFlashcardScreenState extends State<AddFlashcardScreen> {
         leadingWidth: 56,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16),
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF374151) : const Color(0xFF3B82F6),
-              borderRadius: BorderRadius.circular(8),
+          child: IconButton(
+            onPressed: () {
+              // Use the callback if provided, otherwise try to navigate back
+              if (widget.onBackPressed != null) {
+                widget.onBackPressed!();
+              } else {
+                Navigator.of(context).pop();
+              }
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: isDark ? Colors.white : Colors.grey[800],
+              size: 20,
             ),
-            child: IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.white,
-                size: 16,
-              ),
-              padding: EdgeInsets.zero,
-            ),
+            padding: EdgeInsets.zero,
           ),
         ),
       ),
@@ -168,88 +169,78 @@ class _AddFlashcardScreenState extends State<AddFlashcardScreen> {
   Widget _buildCategorySelector() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: isDark ? Colors.grey[850] : Colors.white,
-        border: Border.all(
-          color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
-          width: 1,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Category',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : Colors.black87,
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Category',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            value: _selectedCategory,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
+                  width: 1,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Color(0xFF3B82F6),
+                  width: 2,
+                ),
+              ),
+              filled: true,
+              fillColor: isDark ? const Color(0xFF2D2D44) : Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
               ),
             ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              value: _selectedCategory,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
-                    width: 1,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
-                    width: 1,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: Color(0xFF3B82F6),
-                    width: 2,
-                  ),
-                ),
-                filled: true,
-                fillColor: isDark ? Colors.grey[800] : Colors.white,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-              dropdownColor: isDark ? Colors.grey[800] : Colors.white,
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.black87,
-                fontSize: 16,
-              ),
-              items: _categories.map((category) {
-                return DropdownMenuItem(
-                  value: category,
-                  child: Row(
-                    children: [
-                      Text(
-                        _getIconForCategory(category),
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(category),
-                    ],
-                  ),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedCategory = value!;
-                });
-              },
+            dropdownColor: isDark ? const Color(0xFF2D2D44) : Colors.white,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontSize: 16,
             ),
-          ],
-        ),
+            items: _categories.map((category) {
+              return DropdownMenuItem(
+                value: category,
+                child: Row(
+                  children: [
+                    Text(
+                      _getIconForCategory(category),
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(category),
+                  ],
+                ),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _selectedCategory = value!;
+              });
+            },
+          ),
+        ],
       ),
     );
   }
@@ -257,75 +248,65 @@ class _AddFlashcardScreenState extends State<AddFlashcardScreen> {
   Widget _buildQuestionField() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: isDark ? Colors.grey[850] : Colors.white,
-        border: Border.all(
-          color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
-          width: 1,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Question',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Question',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : Colors.black87,
             ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _questionController,
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.black87,
-                fontSize: 16,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Enter your question here...',
-                hintStyle: TextStyle(
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
-                    width: 1,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
-                    width: 1,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: Color(0xFF3B82F6),
-                    width: 2,
-                  ),
-                ),
-                filled: true,
-                fillColor: isDark ? Colors.grey[800] : Colors.white,
-                contentPadding: const EdgeInsets.all(16),
-              ),
-              maxLines: 3,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Please enter a question';
-                }
-                return null;
-              },
+          ),
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: _questionController,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontSize: 16,
             ),
-          ],
-        ),
+            decoration: InputDecoration(
+              hintText: 'Enter your question here...',
+              hintStyle: TextStyle(
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
+                  width: 1,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Color(0xFF3B82F6),
+                  width: 2,
+                ),
+              ),
+              filled: true,
+              fillColor: isDark ? const Color(0xFF2D2D44) : Colors.white,
+              contentPadding: const EdgeInsets.all(16),
+            ),
+            maxLines: 3,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please enter a question';
+              }
+              return null;
+            },
+          ),
+        ],
       ),
     );
   }
@@ -333,75 +314,65 @@ class _AddFlashcardScreenState extends State<AddFlashcardScreen> {
   Widget _buildAnswerField() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: isDark ? Colors.grey[850] : Colors.white,
-        border: Border.all(
-          color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
-          width: 1,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Answer',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Answer',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : Colors.black87,
             ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _answerController,
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.black87,
-                fontSize: 16,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Enter the answer here...',
-                hintStyle: TextStyle(
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
-                    width: 1,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
-                    width: 1,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: Color(0xFF3B82F6),
-                    width: 2,
-                  ),
-                ),
-                filled: true,
-                fillColor: isDark ? Colors.grey[800] : Colors.white,
-                contentPadding: const EdgeInsets.all(16),
-              ),
-              maxLines: 3,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Please enter an answer';
-                }
-                return null;
-              },
+          ),
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: _answerController,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontSize: 16,
             ),
-          ],
-        ),
+            decoration: InputDecoration(
+              hintText: 'Enter the answer here...',
+              hintStyle: TextStyle(
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
+                  width: 1,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Color(0xFF3B82F6),
+                  width: 2,
+                ),
+              ),
+              filled: true,
+              fillColor: isDark ? const Color(0xFF2D2D44) : Colors.white,
+              contentPadding: const EdgeInsets.all(16),
+            ),
+            maxLines: 3,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please enter an answer';
+              }
+              return null;
+            },
+          ),
+        ],
       ),
     );
   }
@@ -409,92 +380,80 @@ class _AddFlashcardScreenState extends State<AddFlashcardScreen> {
   Widget _buildImageSection() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: isDark ? Colors.grey[850] : Colors.white,
-        border: Border.all(
-          color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
-          width: 1,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Image (Optional)',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : Colors.black87,
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Image (Optional)',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (_imagePath != null) ...[
+            Container(
+              height: 200,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.file(File(_imagePath!), fit: BoxFit.cover),
               ),
             ),
             const SizedBox(height: 12),
-            if (_imagePath != null) ...[
-              Container(
-                height: 200,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
-                  ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.file(File(_imagePath!), fit: BoxFit.cover),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _pickImage,
-                      icon: const Icon(Icons.edit),
-                      label: const Text('Change Image'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: isDark
-                            ? Colors.white
-                            : Colors.grey[700],
-                        side: BorderSide(
-                          color: isDark ? Colors.grey[600]! : Colors.grey[400]!,
-                        ),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _pickImage,
+                    icon: const Icon(Icons.edit),
+                    label: const Text('Change Image'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: isDark ? Colors.white : Colors.grey[700],
+                      side: BorderSide(
+                        color: isDark ? Colors.grey[600]! : Colors.grey[400]!,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _removeImage,
-                      icon: const Icon(Icons.delete),
-                      label: const Text('Remove'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        side: const BorderSide(color: Colors.red),
-                      ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _removeImage,
+                    icon: const Icon(Icons.delete),
+                    label: const Text('Remove'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red),
                     ),
                   ),
-                ],
-              ),
-            ] else ...[
-              OutlinedButton.icon(
-                onPressed: _pickImage,
-                icon: const Icon(Icons.add_photo_alternate),
-                label: const Text('Add Image'),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                  foregroundColor: isDark ? Colors.white : Colors.grey[700],
-                  side: BorderSide(
-                    color: isDark ? Colors.grey[600]! : Colors.grey[400]!,
-                  ),
+                ),
+              ],
+            ),
+          ] else ...[
+            OutlinedButton.icon(
+              onPressed: _pickImage,
+              icon: const Icon(Icons.add_photo_alternate),
+              label: const Text('Add Image'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+                foregroundColor: isDark ? Colors.white : Colors.grey[700],
+                side: BorderSide(
+                  color: isDark ? Colors.grey[600]! : Colors.grey[400]!,
                 ),
               ),
-            ],
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
